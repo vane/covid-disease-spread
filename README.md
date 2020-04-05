@@ -2,7 +2,8 @@
 
 Shows disease spread from begginging till today using interactive world map.  
 
-![Website demo](screenshot.gif)
+![Website demo](card.png)
+![Website demo](screenshot.gif)  
 
 ### Thanks 
 
