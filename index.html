@@ -26,6 +26,15 @@
     .leaflet-container {
       background-color: #c5e8ff;
     }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -224,7 +233,6 @@
             var dformat = dt.getFullYear()+"-"+(dt.getMonth()+1)+"-"+dt.getDate();
             gid('date_range_current').innerText = dformat;
             var colorStep = covidData.maxCases / colors.range;
-            var coronaText = '';
             var coronaCountries = [];
             // console.log('color step', colorStep);
             var layer, country, stats, colorIndex, props;
@@ -240,7 +248,14 @@
                         });
                         props = layer.feature.properties;
                         // lets create list of countries here
-                        coronaCountries.push({'code': ccode, 'cases': stats.cgrow, 'name': props.name});
+                        coronaCountries.push({
+                          'code': ccode,
+                          'cases': stats.cgrow,
+                          'name': props.name,
+                          'deaths':stats.dgrow,
+                          'dcases':stats.cases,
+                          'ddeaths':stats.deaths,
+                        });
                         // console.log(ccode, stats, colorIndex);
                     } else {
                         layer.setStyle({
@@ -263,9 +278,12 @@
                 }
                 return 0;
             });
+            var coronaText = '<table><thead><th>Country</th><th>Total Cases</th><th>Total Deaths</th>';
+            coronaText += '<th>Day Cases</th><th>Day Deaths</th></thead><tbody>';
             coronaCountries.forEach(function(c) {
-                coronaText += '<span><b>'+c.name+'</b> '+ c.cases +'</span><br />';
+                coronaText += '<tr><td><b>'+c.name+'</b></td><td>'+c.cases+'</td>'+'<td>'+c.deaths+'</td>'+'<td>'+c.dcases+'</td>'+'<td>'+c.ddeaths+'</td>'+'</tr>';
             })
+            coronaText += '</tbody></table>';
             coronacases.innerHTML = coronaText;
         };
         var rangeValueChange = function(e) {
