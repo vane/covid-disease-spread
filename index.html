@@ -199,7 +199,12 @@
                     }
                     stats.cgrow = country.ctotal;
                     stats.dgrow = country.dtotal;
-                    countryCache[ccode] = stats;
+                    countryCache[ccode] = {
+                      cgrow: stats.cgrow,
+                      dgrow: stats.dgrow,
+                      cases: 0,
+                      deaths: 0,
+                    };
                 } else {
                     // let's fill gaps
                     country.data[dateFormat] = countryCache[ccode]
