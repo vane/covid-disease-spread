@@ -16,7 +16,7 @@ jobs:
         ./download.csv.sh
     - name: Commit files
       run: |
-        git config --local user.email "action@github.com"
+        git config --local user.email "action@vane.pl"
         git config --local user.name "GitHub Action"
         git commit -m "Update csv data" -a
     - name: Push changes
