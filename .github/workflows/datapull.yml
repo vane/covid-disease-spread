@@ -2,7 +2,7 @@ name: Get new data
 
 on:
   schedule:
-  - cron: "0 0/6 * * *"
+  - cron: "0 0/7 * * *"
 
 jobs:
   stale:
@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@master
     - name: Create local changes
       run: |
-        sh download.csv.sh
+        ./download.csv.sh
     - name: Commit files
       run: |
         git config --local user.email "action@github.com"
