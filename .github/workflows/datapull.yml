@@ -1,4 +1,4 @@
-name: Get new data
+name: Get ecdc.europa.eu csv data
 
 on:
   schedule:
