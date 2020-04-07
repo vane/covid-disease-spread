@@ -1,8 +1,8 @@
-name: Get new data
+name: Get ecdc.europa.eu csv data
 
 on:
   schedule:
-  - cron: "0 0/7 * * *"
+  - cron: "0 16 * * *"
 
 jobs:
   stale:
@@ -16,7 +16,7 @@ jobs:
         ./download.csv.sh
     - name: Commit files
       run: |
-        git config --local user.email "action@github.com"
+        git config --local user.email "github.action@vane.pl"
         git config --local user.name "GitHub Action"
         git commit -m "Update csv data" -a
     - name: Push changes
