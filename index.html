@@ -285,10 +285,10 @@
                 }
                 return 0;
             });
-            var coronaText = '<table><thead><th>Country</th><th>Total Cases</th><th>Total Deaths</th>';
+            var coronaText = '<table><thead><th>Rank</th><th>Country</th><th>Total Cases</th><th>Total Deaths</th>';
             coronaText += '<th>Day Cases</th><th>Day Deaths</th></thead><tbody>';
-            coronaCountries.forEach(function(c) {
-                coronaText += '<tr><td><b>'+c.name+'</b></td><td>'+c.cases+'</td>'+'<td>'+c.deaths+'</td>'+'<td>'+c.dcases+'</td>'+'<td>'+c.ddeaths+'</td>'+'</tr>';
+            coronaCountries.forEach(function(c, i) {
+                coronaText += '<tr><td>'+(i+1)+'</td><td><b>'+c.name+'</b></td><td>'+c.cases+'</td>'+'<td>'+c.deaths+'</td>'+'<td>'+c.dcases+'</td>'+'<td>'+c.ddeaths+'</td>'+'</tr>';
             })
             coronaText += '</tbody></table>';
             coronacases.innerHTML = coronaText;
