@@ -67,15 +67,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.1/leaflet.js"></script>
 <script>
   // helper
-  var gid = (id) => {
+  const gid = (id) => {
       return document.getElementById(id);
   }
-  var formatNumber = (x, sep) => {
+  const formatNumber = (x, sep) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
   }
   // maps
-  var mapPath = 'data/110m.geo.json'
-  var mapStyle = {
+  const mapPath = 'data/110m.geo.json'
+  const mapStyle = {
     stroke: true,
     weight: 1,
     fill: true,
@@ -83,11 +83,11 @@
     fillOpacity: 1
   }
 
-  var countryLayer = {};
-  var covidDataCache = {};  
+  const countryLayer = {};
+  let covidDataCache = {};  
   // gradient
 
-  var colors = {
+  const colors = {
     start: [255, 255, 255],
     end: [255, 0, 0],
     gradients: [],
@@ -96,22 +96,22 @@
     autoplaySpeed: 250,
   }
   // https://stackoverflow.com/questions/24016456/how-to-programmatically-create-n-sequential-equidistant-colors-ranging-from-dark
-  var linearGradient = (n) => {
-      var gradients = [];
-      var gradientsCol = [];
-      var dRGB = [];
-      for (var i = 0;i<colors.start.length;i++) {
-          var color1 = colors.start[i];
-          var color2 = colors.end[i];
+  const linearGradient = (n) => {
+      const gradients = [];
+      const gradientsCol = [];
+      const dRGB = [];
+      for (let i = 0;i<colors.start.length;i++) {
+          const color1 = colors.start[i];
+          const color2 = colors.end[i];
           var c = (color2 - color1)/((n/2) - 1);
           dRGB.push(c);
       }
-      for (var k = 0;k<n;k++) {
-          var col = [];
-          for(var j = 0;j<colors.start.length;j++) {
-              var dx = dRGB[j];
-              var color1 = colors.start[j];
-              var c = parseInt(color1+k*dx);
+      for (let k = 0;k<n;k++) {
+          const col = [];
+          for(let j = 0;j<colors.start.length;j++) {
+              const dx = dRGB[j];
+              const color1 = colors.start[j];
+              const c = parseInt(color1+k*dx);
               col.push(c);
           }
           gradientsCol.push('rgb('+col.join(',')+')');
@@ -183,18 +183,18 @@
       return covidData;
     }).then((covidData) => {
         // country disease calculate
-        var start = covidData.start;
+        const start = covidData.start;
         // end date
-        var end = new Date(covidData.end.year, covidData.end.month, covidData.end.day + 1);
-        var countries = covidData.country;
-        var dateFormat, ccode, country, stats;
+        const end = new Date(covidData.end.year, covidData.end.month, covidData.end.day + 1);
+        const countries = covidData.country;
+        let dateFormat, ccode, country, stats;
         covidData.totalDays = 0;
         covidData.maxCasesCountry = '';
         covidData.maxCases = 0;
         covidData.maxDeathsCountry = '';
         covidData.maxDeaths = 0;
         // let's fill gaps
-        var countryCache = {};
+        const countryCache = {};
         // https://stackoverflow.com/questions/4345045/javascript-loop-between-date-ranges
         // iterate over dates
         for(var s = new Date(start.year, start.month - 1, start.day);s < end;s.setDate(s.getDate() + 1)) {
@@ -303,10 +303,10 @@
                 }
                 return 0;
             });
-            var coronaText = '<table><thead><th>Rank</th><th>Country</th><th>Total Cases</th><th>Total Deaths</th>';
+            let coronaText = '<table><thead><th>Rank</th><th>Country</th><th>Total Cases</th><th>Total Deaths</th>';
             coronaText += '<th>Day Cases</th><th>Day Deaths</th></thead><tbody>';
-            var cc = '';
-            var tc = {
+            let cc = '';
+            const tc = {
               cases: 0,
               deaths: 0,
               dcases: 0,
@@ -317,24 +317,38 @@
               tc.deaths += c.deaths;
               tc.dcases += c.dcases;
               tc.ddeaths += c.ddeaths;
-              cc += '<tr><td>'+(i+1)+'</td><td><b>'+c.name+'</b></td><td>'+c.cases+'</td>'+'<td>'+c.deaths+'</td>'+'<td>'+c.dcases+'</td>'+'<td>'+c.ddeaths+'</td>'+'</tr>';
+              cc += `<tr>
+                <td>${i+1}</td>
+                <td><b>${c.name}</b></td>
+                <td>${c.cases}</td>
+                <td>${c.deaths}</td>
+                <td>${c.dcases}</td>
+                <td>${c.ddeaths}</td>
+              </tr>`;              
             })
-            coronaText += '<tr><td>0</td><td><b>Total</b></td><td>'+tc.cases+'</td>'+'<td>'+tc.deaths+'</td>'+'<td>'+tc.dcases+'</td>'+'<td>'+tc.ddeaths+'</td>'+'</tr>';
+            coronaText += `<tr>
+              <td>0</td>
+              <td><b>Total</b></td>
+              <td>${tc.cases}</td>
+              <td>${tc.deaths}</td>
+              <td>${tc.dcases}</td>
+              <td>${tc.ddeaths}</td>
+            </tr>`;
             coronaText += cc;
             coronaText += '</tbody></table>';
             coronacases.innerHTML = coronaText;
         };
-        var rangeValueChange = (e) => {
+        const rangeValueChange = (e) => {
             clearTimeout(calcTimeout);
             clearInterval(autoPlayIntervalId);
             gid('autoplay_checkbox').checked = false;
-            var value = e.target.value;
+            const value = e.target.value;
             calcTimeout = setTimeout(() => {
                 colorCountries(value);
             }, 250);
         };
-        var autoplayChange = () => {
-            var checked = gid('autoplay_checkbox').checked;
+        const autoplayChange = () => {
+            const checked = gid('autoplay_checkbox').checked;
             if(!checked) {
                 clearInterval(autoPlayIntervalId);
             } else {
