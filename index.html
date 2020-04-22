@@ -53,7 +53,8 @@
         </div>
     </div>
     <div style="padding-left:10px;">
-        <h1></h1>
+        <label id="rollover_data" style="color:blue;"></label>
+        <br />
         <label>Autoplay <input id="autoplay_checkbox" type="checkbox" checked></label>
         <br />
         <label>Date <span id="date_range_current">2019-12-31</span>
@@ -66,8 +67,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.1/leaflet.js"></script>
 <script>
   // helper
-  var gid = function(id) {
+  var gid = (id) => {
       return document.getElementById(id);
+  }
+  var formatNumber = (x, sep) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
   }
   // maps
   var mapPath = 'data/110m.geo.json'
@@ -80,7 +84,7 @@
   }
 
   var countryLayer = {};
-
+  var covidDataCache = {};  
   // gradient
 
   var colors = {
@@ -92,7 +96,7 @@
     autoplaySpeed: 250,
   }
   // https://stackoverflow.com/questions/24016456/how-to-programmatically-create-n-sequential-equidistant-colors-ranging-from-dark
-  var linearGradient = function (n) {
+  var linearGradient = (n) => {
       var gradients = [];
       var gradientsCol = [];
       var dRGB = [];
@@ -117,50 +121,59 @@
       colors.gradientsCol = gradientsCol;
   }
   linearGradient(colors.range+1);
-  $.getJSON(mapPath, function (data) {
-    var map = L.map('map').setView([45, 0], 1.05)
-
+  $.getJSON(mapPath, (data) => {
+    let map = L.map('map').setView([45, 0], 1.05);
     L.geoJson(data, {
-      clickable: false,
+      clickable: true,
       style: mapStyle,
-      onEachFeature: function (feature, layer) {
-        // console.log(feature, feature.properties.iso_a2);
-        let ccode = feature.properties.iso_a2;
-        if(feature.properties.iso_a2 == "GB") {
-          ccode = "UK"
+      //interactive: false,
+      onEachFeature: (feature, layer) => {
+        let toCCode = (c) => {
+          if(feature.properties.iso_a2 == "GB") {
+            return "UK"
+          }
+          return c;
         }
+        let ccode = toCCode(feature.properties.iso_a2);
+        const prevColor = {
+          set: false,
+          col: '',
+        };
         countryLayer[ccode] = layer;
-        layer.on('mouseover', function () {
-          layer.setStyle({
-            fillColor: '#0000ff'
-          })
+        layer.on('mouseover', (e) => {
+          const props = e.target.feature.properties;
+          const ccode = toCCode(props.iso_a2);
+          const covid = covidDataCache.country[ccode];
+          if(data && covidDataCache) {
+            const cont = gid('rollover_data');
+            cont.innerText = `${props.sovereignt} - Total : ${formatNumber(covid.ctotal, " ")} Deaths : ${formatNumber(covid.dtotal, " ")}`;
+          }
         })
-        layer.on('mouseout', function () {
-          layer.setStyle({
-            fillColor: '#fff'
-          })
+        layer.on('mouseout', (e) => {
+          const cont = gid('rollover_data');
+          cont.innerText = '';
         })
       },
-    }).addTo(map)
-  }).then(function () {
+    }).addTo(map);    
+  }).then(() => {
     console.log('finish drawing countries');
-    $.get('data/download.csv').then(function (data) {
-      var today = new Date()
-      var covidData = {}
+    $.get('data/download.csv').then((data) => {      
+      const covidData = {}
+      const today = new Date();
       covidData.country = {};
       covidData.end = {day: today.getDate(), month: today.getMonth(), year: today.getFullYear()}
       covidData.start = {country: 'CN', day: 31, month: 12, year: 2019}
-      data.split('\n').forEach(function (row, i) {
+      data.split('\n').forEach((row, i) => {
         if (i > 1) {
-          var a = row.split(',')
-          var date = a[0]
-          var day = a[1]
-          var month = a[2]
-          var year = a[3]
-          var cases = parseInt(a[4])
-          var deaths = parseInt(a[5])
-          var geoId = a[7]
-          var population = parseInt(a[9])
+          const a = row.split(',')
+          const date = a[0]
+          const day = a[1]
+          const month = a[2]
+          const year = a[3]
+          const cases = parseInt(a[4])
+          const deaths = parseInt(a[5])
+          const geoId = a[7]
+          const population = parseInt(a[9])
           if (!covidData.country[geoId]) {
             covidData.country[geoId] = {data: {}, population: population, ctotal: 0, dtotal: 0}
           }
@@ -168,7 +181,7 @@
         }
       });
       return covidData;
-    }).then(function(covidData) {
+    }).then((covidData) => {
         // country disease calculate
         var start = covidData.start;
         // end date
@@ -223,13 +236,14 @@
         console.log('total days', covidData.totalDays);
         //console.log(colors.steps);
         return covidData;
-    }).then(function(covidData) {
+    }).then((covidData) => {
         // initialize controls
         // console.log(covidData);
+        covidDataCache = covidData;
         var calcTimeout = -1;
         var autoPlayIntervalId = 0;
         var coronacases = gid('coronacases');
-        var autoplay = function() {
+        var autoplay = () => {
             var value = parseInt(gid('date_range').value);
             if (value >= covidData.totalDays - 1) {
                 value = 0;
@@ -238,7 +252,7 @@
             gid('date_range').value = value + 1;
             colorCountries(value);
         };
-        var colorCountries = function(value) {
+        var colorCountries = (value) => {
             var dt = new Date(covidData.start.year, covidData.start.month - 1, covidData.start.day);
             dt.setDate(dt.getDate() + parseInt(value));
             var dformat = dt.getFullYear()+"-"+(dt.getMonth()+1)+"-"+dt.getDate();
@@ -281,7 +295,7 @@
                 }
             }
             // now sort the countries and build the list control
-            coronaCountries.sort(function(a, b) {
+            coronaCountries.sort((a, b) => {
                 if(a.cases > b.cases) {
                     return -1;
                 } else if (a.cases < b.cases) {
@@ -298,7 +312,7 @@
               dcases: 0,
               ddeaths: 0,
             };
-            coronaCountries.forEach(function(c, i) {
+            coronaCountries.forEach((c, i) => {
               tc.cases += c.cases;
               tc.deaths += c.deaths;
               tc.dcases += c.dcases;
@@ -310,16 +324,16 @@
             coronaText += '</tbody></table>';
             coronacases.innerHTML = coronaText;
         };
-        var rangeValueChange = function(e) {
+        var rangeValueChange = (e) => {
             clearTimeout(calcTimeout);
             clearInterval(autoPlayIntervalId);
             gid('autoplay_checkbox').checked = false;
             var value = e.target.value;
-            calcTimeout = setTimeout(function() {
+            calcTimeout = setTimeout(() => {
                 colorCountries(value);
             }, 250);
         };
-        var autoplayChange = function() {
+        var autoplayChange = () => {
             var checked = gid('autoplay_checkbox').checked;
             if(!checked) {
                 clearInterval(autoPlayIntervalId);
