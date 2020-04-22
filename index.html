@@ -125,7 +125,11 @@
       style: mapStyle,
       onEachFeature: function (feature, layer) {
         // console.log(feature, feature.properties.iso_a2);
-        countryLayer[feature.properties.iso_a2] = layer;
+        let ccode = feature.properties.iso_a2;
+        if(feature.properties.iso_a2 == "GB") {
+          ccode = "UK"
+        }
+        countryLayer[ccode] = layer;
         layer.on('mouseover', function () {
           layer.setStyle({
             fillColor: '#0000ff'
