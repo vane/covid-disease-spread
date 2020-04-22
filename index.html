@@ -103,7 +103,7 @@
       for (let i = 0;i<colors.start.length;i++) {
           const color1 = colors.start[i];
           const color2 = colors.end[i];
-          var c = (color2 - color1)/((n/2) - 1);
+          const c = (color2 - color1)/((n/2) - 1);
           dRGB.push(c);
       }
       for (let k = 0;k<n;k++) {
@@ -146,7 +146,7 @@
           const covid = covidDataCache.country[ccode];
           if(data && covidDataCache) {
             const cont = gid('rollover_data');
-            cont.innerText = `${props.sovereignt} - Total : ${formatNumber(covid.ctotal, " ")} Deaths : ${formatNumber(covid.dtotal, " ")}`;
+            cont.innerText = `${props.sovereignt} - Total : ${formatNumber(covid.ctotal, " ")} Deaths : ${formatNumber(covid.dtotal, " ")} Population : ${formatNumber(props.pop_est, " ")}`;
           }
         })
         layer.on('mouseout', (e) => {
@@ -197,7 +197,7 @@
         const countryCache = {};
         // https://stackoverflow.com/questions/4345045/javascript-loop-between-date-ranges
         // iterate over dates
-        for(var s = new Date(start.year, start.month - 1, start.day);s < end;s.setDate(s.getDate() + 1)) {
+        for(let s = new Date(start.year, start.month - 1, start.day);s < end;s.setDate(s.getDate() + 1)) {
             dateFormat = s.getFullYear()+"-"+(s.getMonth() + 1)+"-"+s.getDate();
             // console.log(dateFormat)
             // iterate over countries
@@ -240,11 +240,11 @@
         // initialize controls
         // console.log(covidData);
         covidDataCache = covidData;
-        var calcTimeout = -1;
-        var autoPlayIntervalId = 0;
-        var coronacases = gid('coronacases');
-        var autoplay = () => {
-            var value = parseInt(gid('date_range').value);
+        let calcTimeout = -1;
+        let autoPlayIntervalId = 0;
+        const coronacases = gid('coronacases');
+        const autoplay = () => {
+            let value = parseInt(gid('date_range').value);
             if (value >= covidData.totalDays - 1) {
                 value = 0;
             }
@@ -252,16 +252,16 @@
             gid('date_range').value = value + 1;
             colorCountries(value);
         };
-        var colorCountries = (value) => {
-            var dt = new Date(covidData.start.year, covidData.start.month - 1, covidData.start.day);
+        const colorCountries = (value) => {
+            const dt = new Date(covidData.start.year, covidData.start.month - 1, covidData.start.day);
             dt.setDate(dt.getDate() + parseInt(value));
-            var dformat = dt.getFullYear()+"-"+(dt.getMonth()+1)+"-"+dt.getDate();
+            const dformat = dt.getFullYear()+"-"+(dt.getMonth()+1)+"-"+dt.getDate();
             gid('date_range_current').innerText = dformat;
-            var colorStep = covidData.maxCases / colors.range;
-            var coronaCountries = [];
+            const colorStep = covidData.maxCases / colors.range;
+            const coronaCountries = [];
             // console.log('color step', colorStep);
-            var layer, country, stats, colorIndex, props;
-            for(var ccode in countryLayer) {
+            let layer, country, stats, colorIndex, props;
+            for(let ccode in countryLayer) {
                 layer = countryLayer[ccode];
                 country = covidData.country[ccode];
                 if(country) {
