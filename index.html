@@ -130,7 +130,11 @@
       onEachFeature: (feature, layer) => {
         let toCCode = (c) => {
           if(feature.properties.iso_a2 == "GB") {
-            return "UK"
+            return "UK";
+          } else if (feature.properties.iso_a2 == "GR") {
+            return "EL";
+          } else if (feature.properties.iso_a2 == "-99") {
+            return "XK";
           }
           return c;
         }
@@ -144,9 +148,11 @@
           const props = e.target.feature.properties;
           const ccode = toCCode(props.iso_a2);
           const covid = covidDataCache.country[ccode];
-          if(data && covidDataCache) {
+          if(data && covid) {
             const cont = gid('rollover_data');
             cont.innerText = `${props.sovereignt} - Total : ${formatNumber(covid.ctotal, " ")} Deaths : ${formatNumber(covid.dtotal, " ")} Population : ${formatNumber(props.pop_est, " ")}`;
+          } else {
+            console.log('problem');
           }
         })
         layer.on('mouseout', (e) => {
