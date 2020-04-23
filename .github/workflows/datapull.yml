@@ -2,7 +2,7 @@ name: Get ecdc.europa.eu csv data
 
 on:
   schedule:
-  - cron: "0 14 * * *"
+  - cron: "0 16 * * *"
 
 jobs:
   stale:
